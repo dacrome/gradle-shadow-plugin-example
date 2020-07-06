@@ -1,0 +1,48 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'java'
+    id 'maven-publish'
+}
+
+group 'de.davidcrome.gradle'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    shadow 'commons-io:commons-io:2.6'
+    implementation 'commons-io:commons-io:2.6'
+
+    shadow 'com.github.docker-java:docker-java:3.2.1'
+    implementation 'com.github.docker-java:docker-java:3.2.1'
+
+    implementation 'com.google.inject:guice:4.2.3'
+    // Transitive dependencies of Guice to be added to the pom by adding them to the shadow Gradle configuration
+    shadow 'com.google.guava:guava:27.1-jre'
+    shadow 'javax.inject:javax.inject:1'
+    shadow 'aopalliance:aopalliance:1.0'
+    shadow 'org.ow2.asm:asm:7.2'
+    shadow 'cglib:cglib:3.3.0'
+}
+
+shadowJar {
+    archiveClassifier = ''
+
+    dependencies {
+        include(dependency('com.google.inject:guice'))
+    }
+
+    // But only relocate Guice
+    relocate 'com.google.inject', 'de.davidcrome.gradle.shadow_plugin_example.com.google.inject'
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
+        }
+    }
+}
