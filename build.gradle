@@ -1,5 +1,5 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'java'
     id 'maven-publish'
 }
@@ -23,21 +23,23 @@ dependencies {
 }
 
 shadowJar {
-    archiveClassifier = ''
+    archiveClassifier.set('')
 
-    // This config includes the Guice dependency and also the google transient dependencies (Guava, ...).
-    // Just including the Guice dependencies does not help at all
-    // because the transitive dependencies will be missing at runtime.
-    include(dependency {
-        it.moduleGroup.contains('com.google')
-    })
+    dependencies {
+        // This config includes the Guice dependency and also the google transient dependencies (Guava, ...).
+        // Just including the Guice dependencies does not help at all
+        // because the transitive dependencies will be missing at runtime.
+        include(dependency {
+            it.moduleGroup.contains('com.google')
+        })
 
-    // The transitive deps must also be added! Lucky me these deps do not have any further runtime dependencies,
-    // otherwise I need to add also the deps of the deps ;)
-    include(dependency('javax.inject:javax.inject'))
-    include(dependency('aopalliance:aopalliance'))
-    include(dependency('org.ow2.asm:asm'))
-    include(dependency('cglib:cglib'))
+        // The transitive deps must also be added! Lucky me these deps do not have any further runtime dependencies,
+        // otherwise I need to add also the deps of the deps ;)
+        include(dependency('javax.inject:javax.inject'))
+        include(dependency('aopalliance:aopalliance'))
+        include(dependency('org.ow2.asm:asm'))
+        include(dependency('cglib:cglib'))
+    }
 
     // But only relocate Guice
     relocate 'com.google.inject', 'de.davidcrome.gradle.shadow_plugin_example.com.google.inject'
